@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@playkostudios/wle-cleaner",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Wonderland Engine project file cleanup utility",
   "main": "dist/index.js",
   "files": [
@@ -28,6 +28,10 @@
     }
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/playkostudios/wle-cleaner.git"
+  },
   "devDependencies": {
     "@tsconfig/node12": "^12.1.0",
     "@types/node": "^20.6.3",
