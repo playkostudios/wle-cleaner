@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { cleanupSingleProject } from './cleanupSingleProject.js';
 
 async function cleanupProject() {
