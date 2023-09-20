@@ -1,0 +1,41 @@
+{
+  "type": "module",
+  "name": "wle-cleaner",
+  "version": "0.1.0",
+  "description": "Wonderland Engine project file cleanup utility",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "bin": {
+    "wle-cleaner": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "wle-cleaner": "node dist/index.js"
+  },
+  "keywords": [
+    "wonderland"
+  ],
+  "contributors": [
+    {
+      "name": "Playko",
+      "url": "https://www.playko.com/"
+    },
+    {
+      "name": "rafern",
+      "email": "rafael@playko.com"
+    }
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@tsconfig/node12": "^12.1.0",
+    "@types/node": "^20.6.3",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@playkostudios/jsonc-ast": "file:playkostudios-jsonc-ast-0.1.0.tgz",
+    "@wonderlandengine/api": "1.0.1",
+    "isolated-vm": "^4.6.0"
+  }
+}
