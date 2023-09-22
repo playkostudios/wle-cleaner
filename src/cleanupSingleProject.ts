@@ -172,26 +172,27 @@ export async function cleanupSingleProject(path: string) {
     for (const [_objectID, tkObjectEntryGeneric] of tkObjects.getTokenEntries()) {
         const tkObjectEntry = ObjectToken.assert(tkObjectEntryGeneric);
 
+        // check if object is linked
+        const tkLinkGeneric = tkObjectEntry.maybeGetValueTokenOfKey('link');
+        const isLinked = tkLinkGeneric !== null;
+        let objectName;
+
+        if (isLinked) {
+            const tkLink = ObjectToken.assert(tkLinkGeneric);
+            objectName = StringToken.assert(tkLink.getValueTokenOfKey('name')).evaluate();
+            // TODO track dependency
+        }
+
+        const tkObjectNameGeneric = tkObjectEntry.maybeGetValueTokenOfKey('name');
+        if (tkObjectNameGeneric) {
+            objectName = StringToken.assert(tkObjectNameGeneric).evaluate();
+        } else if (!objectName) {
+            throw new Error(`Malformed object (missing name despite being unlinked)`);
+        }
+
         // clean up components
         const tkComponentsGeneric = tkObjectEntry.maybeGetValueTokenOfKey('components');
         if (tkComponentsGeneric) {
-            const tkLinkGeneric = tkObjectEntry.maybeGetValueTokenOfKey('link');
-            const isLinked = tkLinkGeneric !== null;
-            let objectName;
-
-            if (isLinked) {
-                const tkLink = ObjectToken.assert(tkLinkGeneric);
-                objectName = StringToken.assert(tkLink.getValueTokenOfKey('name')).evaluate();
-                // TODO track dependency
-            }
-
-            const tkObjectNameGeneric = tkObjectEntry.maybeGetValueTokenOfKey('name');
-            if (tkObjectNameGeneric) {
-                objectName = StringToken.assert(tkObjectNameGeneric).evaluate();
-            } else if (!objectName) {
-                throw new Error(`Malformed object (missing name despite being unlinked)`);
-            }
-
             const tkComponents = ArrayToken.assert(tkComponentsGeneric);
             const tkComponentEntries = tkComponents.getTokenEntries();
             const tkComponentEntryCount = tkComponentEntries.length;
@@ -285,67 +286,70 @@ export async function cleanupSingleProject(path: string) {
             }
         }
 
-        // clean up transforms
-        const tkTranslationGeneric = tkObjectEntry.maybeGetValueTokenOfKey('translation');
-        if (tkTranslationGeneric) {
-            const tkTranslation = ArrayToken.assert(tkTranslationGeneric);
-            const tkNumParts = tkTranslation.getTokenEntries();
-            if (tkNumParts.length !== 3) {
-                throw new Error(`Expected "translation" to have 3 elements, ${tkNumParts.length} found`);
-            }
+        // clean up transforms if object is not linked (default values are
+        // different for linked objects)
+        if (!isLinked) {
+            const tkTranslationGeneric = tkObjectEntry.maybeGetValueTokenOfKey('translation');
+            if (tkTranslationGeneric) {
+                const tkTranslation = ArrayToken.assert(tkTranslationGeneric);
+                const tkNumParts = tkTranslation.getTokenEntries();
+                if (tkNumParts.length !== 3) {
+                    throw new Error(`Expected "translation" to have 3 elements, ${tkNumParts.length} found in object with name "${objectName}"`);
+                }
 
-            let canReset = true;
-            for (const tkNumPartGeneric of tkNumParts) {
-                const tkNumPart = NumberToken.assert(tkNumPartGeneric);
-                if (normalizeZeroOneToken(tkNumPart, tkTranslation) !== 0) {
-                    canReset = false;
+                let canReset = true;
+                for (const tkNumPartGeneric of tkNumParts) {
+                    const tkNumPart = NumberToken.assert(tkNumPartGeneric);
+                    if (normalizeZeroOneToken(tkNumPart, tkTranslation) !== 0) {
+                        canReset = false;
+                    }
+                }
+
+                if (canReset) {
+                    tkObjectEntry.deleteKey('translation');
                 }
             }
 
-            if (canReset) {
-                tkObjectEntry.deleteKey('translation');
-            }
-        }
+            const tkScalingGeneric = tkObjectEntry.maybeGetValueTokenOfKey('scaling');
+            if (tkScalingGeneric) {
+                const tkScaling = ArrayToken.assert(tkScalingGeneric);
+                const tkNumParts = tkScaling.getTokenEntries();
+                if (tkNumParts.length !== 3) {
+                    throw new Error(`Expected "scaling" to have 3 elements, ${tkNumParts.length} found in object with name "${objectName}"`);
+                }
 
-        const tkScalingGeneric = tkObjectEntry.maybeGetValueTokenOfKey('scaling');
-        if (tkScalingGeneric) {
-            const tkScaling = ArrayToken.assert(tkScalingGeneric);
-            const tkNumParts = tkScaling.getTokenEntries();
-            if (tkNumParts.length !== 3) {
-                throw new Error(`Expected "scaling" to have 3 elements, ${tkNumParts.length} found`);
-            }
+                let canReset = true;
+                for (const tkNumPartGeneric of tkNumParts) {
+                    const tkNumPart = NumberToken.assert(tkNumPartGeneric);
+                    if (normalizeZeroOneToken(tkNumPart, tkScaling) !== 1) {
+                        canReset = false;
+                    }
+                }
 
-            let canReset = true;
-            for (const tkNumPartGeneric of tkNumParts) {
-                const tkNumPart = NumberToken.assert(tkNumPartGeneric);
-                if (normalizeZeroOneToken(tkNumPart, tkScaling) !== 1) {
-                    canReset = false;
+                if (canReset) {
+                    tkObjectEntry.deleteKey('scaling');
                 }
             }
 
-            if (canReset) {
-                tkObjectEntry.deleteKey('scaling');
-            }
-        }
-
-        const tkRotationGeneric = tkObjectEntry.maybeGetValueTokenOfKey('rotation');
-        if (tkRotationGeneric) {
-            const tkRotation = ArrayToken.assert(tkRotationGeneric);
-            const tkNumParts = tkRotation.getTokenEntries();
-            if (tkNumParts.length !== 4) {
-                throw new Error(`Expected "rotation" to have 4 elements, ${tkNumParts.length} found`);
-            }
-
-            let canReset = true;
-            for (let i = 0; i < 4; i++) {
-                const tkNumPart = NumberToken.assert(tkNumParts[i]);
-                if (normalizeZeroOneToken(tkNumPart, tkRotation) !== (i === 3 ? 1 : 0)) {
-                    canReset = false;
+            const tkRotationGeneric = tkObjectEntry.maybeGetValueTokenOfKey('rotation');
+            if (tkRotationGeneric) {
+                const tkRotation = ArrayToken.assert(tkRotationGeneric);
+                const tkNumParts = tkRotation.getTokenEntries();
+                if (tkNumParts.length !== 4) {
+                    throw new Error(`Expected "rotation" to have 4 elements, ${tkNumParts.length} found in object with name "${objectName}"`);
                 }
-            }
 
-            if (canReset) {
-                tkObjectEntry.deleteKey('rotation');
+                let canReset = true;
+                for (let i = 0; i < 4; i++) {
+                    const tkNumPart = NumberToken.assert(tkNumParts[i]);
+                    if (normalizeZeroOneToken(tkNumPart, tkRotation) !== (i === 3 ? 1 : 0)) {
+                        canReset = false;
+                    }
+                }
+
+                if (canReset) {
+                    tkObjectEntry.deleteKey('rotation');
+                }
             }
         }
     }

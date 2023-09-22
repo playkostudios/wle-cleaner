@@ -5,6 +5,7 @@ tool is very experimental, use at your own risk. Always verify that the cleaned
 project is OK after using the tool. Make sure to use version control**
 
 Source code: https://github.com/playkostudios/wle-cleaner
+
 NPM package: https://www.npmjs.com/package/@playkostudios/wle-cleaner
 
 ## Installing
