@@ -155,7 +155,7 @@ export async function cleanupSingleProject(path: string) {
     const tkAnimations = ObjectToken.assert(tkRoot.getValueTokenOfKey('animations'));
     const tkSkins = ObjectToken.assert(tkRoot.getValueTokenOfKey('skins'));
     const tkPipelines = ObjectToken.assert(tkRoot.getValueTokenOfKey('pipelines'));
-    const tkFiles = ArrayToken.assert(tkRoot.getValueTokenOfKey('files'));
+    const tkFiles = ObjectToken.assert(tkRoot.getValueTokenOfKey('files'));
     const tkFonts = ObjectToken.assert(tkRoot.getValueTokenOfKey('fonts'));
     const tkLanguages = ObjectToken.assert(tkRoot.getValueTokenOfKey('languages'));
 

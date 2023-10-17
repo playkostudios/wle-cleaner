@@ -13,7 +13,7 @@ export interface WLECleanerContext {
     tkAnimations: ObjectToken,
     tkSkins: ObjectToken,
     tkPipelines: ObjectToken,
-    tkFiles: ArrayToken,
+    tkFiles: ObjectToken,
     tkFonts: ObjectToken,
     tkLanguages: ObjectToken,
 }
