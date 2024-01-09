@@ -50,7 +50,16 @@ export function parseEditorBundle() {
     });
 
     let editorBundleText = readFileSync('cache/js/_editor_bundle.cjs', { encoding: 'utf8' });
-    editorBundleText = `${BUNDLE_PREAMBLE}\n${editorBundleText}`;
+
+    let editorExtraBundleText = '';
+    const editorExtraBundlePath = 'editor_extra_bundle.js';
+    try {
+        editorExtraBundleText = readFileSync(editorExtraBundlePath, { encoding: "utf8" });
+    } catch (error) {
+        // Do nothing, file might not exists and it's fine
+    }
+
+    editorBundleText = `${BUNDLE_PREAMBLE}\n${editorExtraBundleText}\n${editorBundleText}`;
 
     const editorIndexModule = isolate.compileModuleSync(editorBundleText);
     editorIndexModule.instantiateSync(context, (specifier) => {
