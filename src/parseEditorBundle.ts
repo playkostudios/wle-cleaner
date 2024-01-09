@@ -25,6 +25,18 @@ const window = {
 };
 
 class URL {}
+
+const HowlerGlobal = {
+    prototype: {}
+};
+
+const Howl = {
+    prototype: {}
+};
+
+const Sound = {
+    prototype: {}
+};
 `;
 
 export function parseEditorBundle() {
