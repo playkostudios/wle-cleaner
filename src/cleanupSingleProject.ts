@@ -26,11 +26,11 @@ import { cleanCompActive } from './cleanCompActive.js';
  * check order: setting, object, animation, skin, mesh, font, language, material, texture, image, pipeline, shader, file
  */
 
-export async function cleanupSingleProject(path: string) {
+export async function cleanupSingleProject(path: string, outputPath: string, editorExtraBundlePath: string | null) {
     // TODO dependency pruning
 
     // get bundle components
-    const bundleComponents = parseEditorBundle();
+    const bundleComponents = parseEditorBundle(editorExtraBundlePath);
 
     // normalize default values of components and panic on unexpected properties
     for (const [compType, compConfig] of bundleComponents) {
@@ -368,7 +368,7 @@ export async function cleanupSingleProject(path: string) {
     tkLanguages.compactIfEmpty();
 
     // write
-    await ast.writeToFile(`cleaned-${path}`);
+    await ast.writeToFile(outputPath);
 
     // display stats
     console.log(`Cleanup statistics:

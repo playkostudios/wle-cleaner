@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@playkostudios/wle-cleaner",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Wonderland Engine project file cleanup utility",
   "main": "dist/index.js",
   "files": [
@@ -40,6 +40,7 @@
   "dependencies": {
     "@playkostudios/jsonc-ast": "^0.1.3",
     "@wonderlandengine/api": "^1.1.3",
+    "commander": "^11.1.0",
     "isolated-vm": "^4.6.0"
   },
   "peerDependencies": {
