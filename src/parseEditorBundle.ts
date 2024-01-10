@@ -5,7 +5,6 @@ import { EDITOR_BUNDLE_EXTRA_DEFAULT } from './constants.js';
 import { CommanderError } from 'commander';
 import { prettyError } from './prettyError.js';
 
-// FIXME there's probably more missing stuff from the global scope
 const BUNDLE_PREAMBLE = `
 function _registerEditor(regExports) {
     for (const possibleComponent of Object.values(regExports)) {
@@ -21,7 +20,10 @@ function _registerEditor(regExports) {
         }
     }
 }
+`;
 
+// TODO remove this in 1.0.0
+const LEGACY_PREAMBLE = `
 const window = {
     navigator: {},
     location: {}
@@ -40,9 +42,9 @@ const Howl = {
 const Sound = {
     prototype: {}
 };
-`;
+`
 
-export function parseEditorBundle(editorBundlePath: string, editorExtraBundlePath: string | null) {
+export function parseEditorBundle(editorBundlePath: string, editorExtraBundlePath: string | null, legacyPreamble: boolean) {
     const isolate = new ivm.Isolate({ memoryLimit: 128 });
     const context = isolate.createContextSync();
     const jail = context.global;
@@ -74,7 +76,13 @@ export function parseEditorBundle(editorBundlePath: string, editorExtraBundlePat
         } catch(err) {}
     }
 
-    editorBundleText = `${BUNDLE_PREAMBLE}\n${editorExtraBundleText}\n${editorBundleText}`;
+    let preambleExtras = '';
+    if (legacyPreamble) {
+        console.warn('WARNING: Using legacy preamble. Consider using the option --no-legacy-preamble and supplying your own editor bundle extras script for missing type definitions');
+        preambleExtras = LEGACY_PREAMBLE;
+    }
+
+    editorBundleText = `${BUNDLE_PREAMBLE}\n${preambleExtras}\n${editorExtraBundleText}\n${editorBundleText}`;
 
     const editorIndexModule = isolate.compileModuleSync(editorBundleText);
     editorIndexModule.instantiateSync(context, (specifier) => {
