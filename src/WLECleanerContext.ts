@@ -1,4 +1,4 @@
-import { type ArrayToken, type ObjectToken } from '@playkostudios/jsonc-ast';
+import { type ObjectToken } from '@playkostudios/jsonc-ast';
 
 export interface WLECleanerContext {
     cleanedDefaults: number,

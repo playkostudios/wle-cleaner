@@ -1,6 +1,9 @@
 import ivm from 'isolated-vm';
 import { readFileSync } from 'node:fs';
 import { type ModifiedComponentPropertyRecord } from './ModifiedComponentProperty.js';
+import { EDITOR_BUNDLE_EXTRA_DEFAULT } from './constants.js';
+import { CommanderError } from 'commander';
+import { prettyError } from './prettyError.js';
 
 // FIXME there's probably more missing stuff from the global scope
 const BUNDLE_PREAMBLE = `
@@ -39,7 +42,7 @@ const Sound = {
 };
 `;
 
-export function parseEditorBundle(editorExtraBundlePath: string | null) {
+export function parseEditorBundle(editorBundlePath: string, editorExtraBundlePath: string | null) {
     const isolate = new ivm.Isolate({ memoryLimit: 128 });
     const context = isolate.createContextSync();
     const jail = context.global;
@@ -51,20 +54,31 @@ export function parseEditorBundle(editorExtraBundlePath: string | null) {
 
     let editorBundleText: string
     try {
-        editorBundleText = readFileSync('cache/js/_editor_bundle.cjs', { encoding: 'utf8' });
+        editorBundleText = readFileSync(editorBundlePath, { encoding: 'utf8' });
     } catch(err) {
-        console.error(err);
-        throw new Error('Could not open editor bundle. Make sure you have build the project in the Wonderland Editor before running this tool');
+        prettyError(err);
+        throw new CommanderError(1, 'bundle-open-fail', 'Could not open editor bundle. Make sure you have build the project in the Wonderland Editor before running this tool');
     }
 
     let editorExtraBundleText = '';
-    if (editorExtraBundlePath) editorExtraBundleText = readFileSync(editorExtraBundlePath, { encoding: "utf8" });
+    if (editorExtraBundlePath) {
+        try {
+            editorExtraBundleText = readFileSync(editorExtraBundlePath, { encoding: "utf8" });
+        } catch(err) {
+            prettyError(err);
+            throw new CommanderError(1, 'bundle-extra-open-fail', 'Could not open editor bundle extra script');
+        }
+    } else {
+        try {
+            editorExtraBundleText = readFileSync(EDITOR_BUNDLE_EXTRA_DEFAULT, { encoding: 'utf8' });
+        } catch(err) {}
+    }
 
     editorBundleText = `${BUNDLE_PREAMBLE}\n${editorExtraBundleText}\n${editorBundleText}`;
 
     const editorIndexModule = isolate.compileModuleSync(editorBundleText);
     editorIndexModule.instantiateSync(context, (specifier) => {
-        throw new Error(`Unexpected import in editor bundle: ${specifier}`);
+        throw new CommanderError(1, 'bundle-import', `Unexpected import in editor bundle: ${specifier}`);
     });
     editorIndexModule.evaluateSync();
 

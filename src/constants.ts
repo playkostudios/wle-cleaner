@@ -5,3 +5,5 @@ export const customPhysxCapsuleOptsType = Symbol('physx-capsule-options');
 export const customPhysxMeshOptsType = Symbol('physx-mesh-options');
 export const customOpaqueColorType = Symbol('opaque-color');
 export const NATIVE_COMPONENTS = ['animation', 'collision', 'input', 'light', 'mesh', 'physx', 'text', 'view'];
+export const EDITOR_BUNDLE_DEFAULT = 'cache/js/_editor_bundle.cjs';
+export const EDITOR_BUNDLE_EXTRA_DEFAULT = 'editor-bundle-extra.js';
