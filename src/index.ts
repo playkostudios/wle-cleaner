@@ -14,57 +14,68 @@ interface CleanerOptions {
 }
 
 async function defaultAction(projectGlobPaths: string, options: CleanerOptions): Promise<void> {
-    for (const projectGlobRaw of projectGlobPaths) {
-        const projectPathsRaw = globSync(projectGlobRaw);
-        for (const projectPathRaw of projectPathsRaw) {
-            try {
+    try {
+        const projectPaths: string[] = [];
+        for (const projectGlobRaw of projectGlobPaths) {
+            const projectPathsRaw = globSync(projectGlobRaw);
+            for (const projectPathRaw of projectPathsRaw) {
                 const projectPath = resolvePath(projectPathRaw);
-
-                let editorBundle: string;
-                if (options.editorBundle) {
-                    editorBundle = resolvePath(options.editorBundle);
-                } else {
-                    editorBundle = resolvePath(parsePath(projectPath).dir, EDITOR_BUNDLE_DEFAULT);
-                }
-
-
-                let editorBundleExtra: string | null = null;
-                if (options.editorBundleExtra) editorBundleExtra = resolvePath(options.editorBundleExtra);
-
-                let outputPath: string;
-                if (options.output) {
-                    outputPath = resolvePath(options.output);
-                } else {
-                    const tempPath = parsePath(projectPath);
-                    tempPath.base = `cleaned-${tempPath.base}`;
-                    outputPath = formatPath(tempPath);
-                }
-
-                if (options.replace) {
-                    if (options.output) {
-                        throw new CommanderError(1, 'output-replace-clash', '--output option cannot be used with --replace flag');
-                    }
-
-                    outputPath = projectPath;
-                }
-
-                console.log(`Cleaning up project: "${projectPath}"...`);
-                await cleanupSingleProject(projectPath, outputPath, editorBundle, editorBundleExtra, options.legacyPreamble);
-            } catch(err) {
-                if (err instanceof CommanderError) {
-                    program.error(err.message, { exitCode: err.exitCode, code: err.code });
-                } else {
-                    console.error(err);
-                    program.error('Unexpected error occurred', { exitCode: 63, code: 'unexpected' });
-                }
+                if (projectPaths.indexOf(projectPath) < 0) projectPaths.push(projectPath);
             }
+        }
+
+        let outPathOverride: string | null = null;
+        if (options.output) {
+            if (options.replace) {
+                throw new CommanderError(1, 'output-replace-clash', '--output option cannot be used with --replace flag');
+            }
+            if (projectPaths.length > 1) {
+                throw new CommanderError(1, 'output-multiple-proj-clash', '--output option cannot be used when multiple projects are specified');
+            }
+
+            outPathOverride = resolvePath(options.output);
+        }
+
+        let editorBundle: string | null = null;
+        if (options.editorBundle) {
+            editorBundle = resolvePath(options.editorBundle);
+        }
+
+        let editorBundleExtra: string | null = null;
+        if (options.editorBundleExtra) editorBundleExtra = resolvePath(options.editorBundleExtra);
+
+        for (const projectPath of projectPaths) {
+            if (!editorBundle) {
+                editorBundle = resolvePath(parsePath(projectPath).dir, EDITOR_BUNDLE_DEFAULT);
+            }
+
+            let outputPath: string;
+            if (outPathOverride) {
+                outputPath = outPathOverride;
+            } else if (options.replace) {
+                outputPath = projectPath;
+            } else {
+                const tempPath = parsePath(projectPath);
+                tempPath.base = `cleaned-${tempPath.base}`;
+                outputPath = formatPath(tempPath);
+            }
+
+            console.log(`Cleaning up project: "${projectPath}"...`);
+            await cleanupSingleProject(projectPath, outputPath, editorBundle, editorBundleExtra, options.legacyPreamble);
+        }
+    } catch(err) {
+        if (err instanceof CommanderError) {
+            program.error(err.message, { exitCode: err.exitCode, code: err.code });
+        } else {
+            console.error(err);
+            program.error('Unexpected error occurred', { exitCode: 63, code: 'unexpected' });
         }
     }
 }
 
 program
     .argument('<project-paths...>', 'File path to project files that need to be cleaned. Each path is a glob pattern')
-    .option('-o, --output <path>', 'Where the cleaned project file will be stored. Does not override the input project by default')
+    .option('-o, --output <path>', 'Where the cleaned project file will be stored. Does not override the input project by default. Cannot be used with multiple project files, or with the --replace option')
     .option('-r, --replace', 'Replace the input project. Cannot be used with --output')
     .option('-b, --editor-bundle <path>', `The editor bundle that was generated by the Wonderland Editor for the input project when building (default: "<project-path directory>/${EDITOR_BUNDLE_DEFAULT}")`)
     .option('-e, --editor-bundle-extra <path>', `Add extra definitions to the editor bundle via a JS script (default: "${EDITOR_BUNDLE_EXTRA_DEFAULT}")`)
