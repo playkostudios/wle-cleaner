@@ -13,7 +13,7 @@ interface CleanerOptions {
     legacyPreamble: boolean,
 }
 
-async function defaultAction(projectGlobPaths: string, options: CleanerOptions): Promise<void> {
+async function defaultAction(projectGlobPaths: string[], options: CleanerOptions): Promise<void> {
     try {
         const projectPaths: string[] = [];
         for (const projectGlobRaw of projectGlobPaths) {
