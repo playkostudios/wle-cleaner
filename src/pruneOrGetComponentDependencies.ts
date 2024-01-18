@@ -1,7 +1,7 @@
 import { ArrayToken, JSONTokenType, NumberToken, type ObjectToken, StringToken, type JSONValueToken } from '@playkostudios/jsonc-ast';
 import { type WLECleanerContext } from './WLECleanerContext.js';
 import { Type } from '@wonderlandengine/api';
-import { customCollisionExtentsOptsType, customCollisionRadiusOptsType, customOpaqueColorType, customPhysxCapsuleOptsType, customPhysxMeshOptsType } from './constants.js';
+import { customCollisionExtentsOptsType, customCollisionRadiusOptsType, customOpaqueColorType, customPhysxCapsuleOptsType, customPhysxMeshOptsType, customVec3Type, customVec4Type } from './constants.js';
 import { type ModifiedComponentPropertyRecord } from './ModifiedComponentProperty.js';
 
 export function pruneOrGetComponentDependencies(context: WLECleanerContext, properties: ModifiedComponentPropertyRecord, compType: string, objectName: string, tkComponentProperties: ObjectToken, propKey: string, tkPropValue: JSONValueToken) {
@@ -45,13 +45,13 @@ export function pruneOrGetComponentDependencies(context: WLECleanerContext, prop
         // TODO track dependency
     } else if (propConfig.type === Type.Skin) {
         // TODO track dependency
-    } else if (propConfig.type === Type.Color || propConfig.type === customOpaqueColorType) {
+    } else if (propConfig.type === Type.Color || propConfig.type === customOpaqueColorType || propConfig.type === customVec3Type || propConfig.type === customVec4Type) {
         if (canPruneDefault) {
-            const expectedLen = (propConfig.type === Type.Color) ? 4 : 3;
+            const expectedLen = (propConfig.type === Type.Color || propConfig.type === customVec4Type) ? 4 : 3;
             const arr = ArrayToken.assert(tkPropValue).evaluate();
 
             if (arr.length !== expectedLen) {
-                throw new Error(`Unexpected color array length (expected ${expectedLen}, got ${arr.length}) for component property "${propKey}" from component with type "${compType}" from object with name "${objectName}"`);
+                throw new Error(`Unexpected vector length (expected ${expectedLen}, got ${arr.length}) for component property "${propKey}" from component with type "${compType}" from object with name "${objectName}"`);
             }
 
             isDefault = true;

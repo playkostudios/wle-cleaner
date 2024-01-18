@@ -3,7 +3,7 @@ import { normalizeZeroOneToken } from './normalizeZeroOneToken.js';
 import { parseEditorBundle } from './parseEditorBundle.js';
 import { Type } from '@wonderlandengine/api';
 import { type WLECleanerContext } from './WLECleanerContext.js';
-import { NATIVE_COMPONENTS, customCollisionExtentsOptsType, customCollisionRadiusOptsType, customOpaqueColorType, customPhysxCapsuleOptsType, customPhysxMeshOptsType } from './constants.js';
+import { NATIVE_COMPONENTS, customCollisionExtentsOptsType, customCollisionRadiusOptsType, customVec3Type, customVec4Type, customOpaqueColorType, customPhysxCapsuleOptsType, customPhysxMeshOptsType } from './constants.js';
 import { pruneOrGetComponentDependencies } from './pruneOrGetComponentDependencies.js';
 import { cleanCompActive } from './cleanCompActive.js';
 
@@ -124,6 +124,8 @@ export async function cleanupSingleProject(path: string, outputPath: string, edi
         lockAxis: { type: Type.Int, default: 0 },
         solverPositionIterations: { type: Type.Int, default: 4 },
         solverVelocityIterations: { type: Type.Int, default: 1 },
+        rotationOffset: { type: customVec4Type, default: [0, 0, 0, 1] },
+        translationOffset: { type: customVec3Type, default: [0, 0, 0] },
     });
 
     bundleComponents.set('text', {
