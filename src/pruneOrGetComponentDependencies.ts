@@ -73,7 +73,7 @@ export function pruneOrGetComponentDependencies(context: WLECleanerContext, prop
 
         // TODO prune default
     } else if (propConfig.type !== Type.Object) {
-        let typeIDName: string | symbol = propConfig.type;
+        let typeIDName: string | symbol | Type.Vector2 | Type.Vector3 | Type.Vector4 = propConfig.type;
         if (typeof typeIDName !== 'string') {
             typeIDName = '<internal wle-cleaner ID>';
         }
