@@ -73,9 +73,9 @@ export function pruneOrGetComponentDependencies(context: WLECleanerContext, prop
 
         // TODO prune default
     } else if (propConfig.type !== Type.Object) {
-        let typeIDName: string | symbol | Type.Vector2 | Type.Vector3 | Type.Vector4 = propConfig.type;
+        let typeIDName: string | unknown = propConfig.type;
         if (typeof typeIDName !== 'string') {
-            typeIDName = '<internal wle-cleaner ID>';
+            typeIDName = `<internal wle-cleaner ID (${String(typeIDName)})>`;
         }
 
         throw new Error(`Unexpected property type ID "${typeIDName}" for component property "${propKey}" from component with type "${compType}" from object with name "${objectName}"`);

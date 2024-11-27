@@ -1,8 +1,8 @@
 # wle-cleaner
 
-Experimental project file cleanup utility for Wonderland Engine 1.0.4. **This
-tool is very experimental, use at your own risk. Always verify that the cleaned
-project is OK after using the tool. Make sure to use version control**
+Experimental project file cleanup utility for Wonderland Engine 1.0.4 to 1.2.x.
+**This tool is very experimental, use at your own risk. Always verify that the
+cleaned project is OK after using the tool. Make sure to use version control**
 
 Source code: https://github.com/playkostudios/wle-cleaner
 

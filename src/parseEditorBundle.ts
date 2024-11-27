@@ -22,29 +22,7 @@ function _registerEditor(regExports) {
 }
 `;
 
-// TODO remove this in 1.0.0
-const LEGACY_PREAMBLE = `
-const window = {
-    navigator: {},
-    location: {}
-};
-
-class URL {}
-
-const HowlerGlobal = {
-    prototype: {}
-};
-
-const Howl = {
-    prototype: {}
-};
-
-const Sound = {
-    prototype: {}
-};
-`
-
-export function parseEditorBundle(editorBundlePath: string, editorExtraBundlePath: string | null, legacyPreamble: boolean) {
+export function parseEditorBundle(editorBundlePath: string, editorExtraBundlePath: string | null) {
     const isolate = new ivm.Isolate({ memoryLimit: 128 });
     const context = isolate.createContextSync();
     const jail = context.global;
@@ -76,15 +54,7 @@ export function parseEditorBundle(editorBundlePath: string, editorExtraBundlePat
         } catch(err) {}
     }
 
-    let preambleExtras = '';
-    if (legacyPreamble) {
-        console.warn('WARNING: Using legacy preamble. Consider using the option --no-legacy-preamble and supplying your own editor bundle extras script for missing type definitions');
-        preambleExtras = LEGACY_PREAMBLE;
-    }
-
-    editorBundleText = `${BUNDLE_PREAMBLE}\n${preambleExtras}\n${editorExtraBundleText}\n${editorBundleText}`;
-
-    const editorIndexModule = isolate.compileModuleSync(editorBundleText);
+    const editorIndexModule = isolate.compileModuleSync(`${BUNDLE_PREAMBLE}\n${editorExtraBundleText}\n${editorBundleText}`);
     editorIndexModule.instantiateSync(context, (specifier) => {
         throw new CommanderError(1, 'bundle-import', `Unexpected import in editor bundle: ${specifier}`);
     });
