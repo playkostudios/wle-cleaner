@@ -130,6 +130,7 @@ export async function cleanupSingleProject(path: string, outputPath: string, edi
 
     bundleComponents.set('text', {
         alignment: { type: Type.Enum, default: 'center', values: ['left', 'center', 'right'] },
+        verticalAlignment: { type: Type.Enum, default: 'middle', values: ['line', 'middle', 'top', 'bottom'] },
         justification: { type: Type.Enum, default: 'middle', values: ['line', 'middle', 'top', 'bottom'] },
         characterSpacing: { type: Type.Float, default: 0 },
         lineSpacing: { type: Type.Float, default: 1.2 },
