@@ -1,9 +1,10 @@
 #!/usr/bin/env node
-import { cleanupSingleProject } from './cleanupSingleProject.js';
+import { JSONAST, ObjectToken, StringToken } from '@playkostudios/jsonc-ast';
 import { CommanderError, program } from 'commander';
-import { format as formatPath, parse as parsePath, resolve as resolvePath } from 'node:path';
-import { EDITOR_BUNDLE_DEFAULT, EDITOR_BUNDLE_EXTRA_DEFAULT } from './constants.js';
 import { globSync } from 'glob';
+import { format as formatPath, parse as parsePath, resolve as resolvePath } from 'node:path';
+import { cleanupSingleProject } from './cleanupSingleProject.js';
+import { EDITOR_BUNDLE_EXTRA_DEFAULT } from './constants.js';
 
 interface CleanerOptions {
     editorBundle?: string,
@@ -44,8 +45,14 @@ async function defaultAction(projectGlobPaths: string[], options: CleanerOptions
         if (options.editorBundleExtra) editorBundleExtra = resolvePath(options.editorBundleExtra);
 
         for (const projectPath of projectPaths) {
+            const ast = new JSONAST();
+            const tkRoot = ObjectToken.assert((await ast.parse(projectPath)).getValueToken());
+            const tkSettings = ObjectToken.assert(tkRoot.getValueTokenOfKey('settings'));
+            const tkProjectSettings = ObjectToken.assert(tkSettings.getValueTokenOfKey("project"));
+            const tkProjectName = StringToken.assert(tkProjectSettings.getValueTokenOfKey("name")).evaluate();
+
             if (!editorBundle) {
-                editorBundle = resolvePath(parsePath(projectPath).dir, EDITOR_BUNDLE_DEFAULT);
+                editorBundle = resolvePath(parsePath(projectPath).dir, "cache/" + tkProjectName + "/js/_editor_bundle.cjs");
             }
 
             let outputPath: string;
@@ -62,7 +69,7 @@ async function defaultAction(projectGlobPaths: string[], options: CleanerOptions
             console.log(`Cleaning up project: "${projectPath}"...`);
             await cleanupSingleProject(projectPath, outputPath, editorBundle, editorBundleExtra);
         }
-    } catch(err) {
+    } catch (err) {
         if (err instanceof CommanderError) {
             program.error(err.message, { exitCode: err.exitCode, code: err.code });
         } else {
