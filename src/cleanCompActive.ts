@@ -1,4 +1,4 @@
-import { JSONTokenType, type ObjectToken, type JSONValueToken } from '@playkostudios/jsonc-ast';
+import { JSONTokenType, type JSONValueToken, type ObjectToken } from '@playkostudios/jsonc-ast';
 import { type WLECleanerContext } from './WLECleanerContext.js';
 
 export function cleanCompActive(context: WLECleanerContext, tkValue: JSONValueToken, tkComponent: ObjectToken, compType: string | null, objectName: string) {

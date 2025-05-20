@@ -1,11 +1,11 @@
 import { ArrayToken, JSONAST, JSONTokenType, NumberToken, ObjectToken, StringToken } from '@playkostudios/jsonc-ast';
-import { normalizeZeroOneToken } from './normalizeZeroOneToken.js';
-import { parseEditorBundle } from './parseEditorBundle.js';
 import { Type } from '@wonderlandengine/api';
 import { type WLECleanerContext } from './WLECleanerContext.js';
-import { NATIVE_COMPONENTS, customCollisionExtentsOptsType, customCollisionRadiusOptsType, customVec3Type, customVec4Type, customOpaqueColorType, customPhysxCapsuleOptsType, customPhysxMeshOptsType } from './constants.js';
-import { pruneOrGetComponentDependencies } from './pruneOrGetComponentDependencies.js';
 import { cleanCompActive } from './cleanCompActive.js';
+import { NATIVE_COMPONENTS, customCollisionExtentsOptsType, customCollisionRadiusOptsType, customOpaqueColorType, customPhysxCapsuleOptsType, customPhysxMeshOptsType, customVec3Type, customVec4Type } from './constants.js';
+import { normalizeZeroOneToken } from './normalizeZeroOneToken.js';
+import { parseEditorBundle } from './parseEditorBundle.js';
+import { pruneOrGetComponentDependencies } from './pruneOrGetComponentDependencies.js';
 
 /**
  * .wlp dependency tree:
@@ -102,10 +102,10 @@ export async function cleanupSingleProject(path: string, outputPath: string, edi
     bundleComponents.set('physx', {
         shape: { type: Type.Enum, default: 'sphere', values: ['none', 'sphere', 'capsule', 'box', 'plane', 'convexMesh', 'triangleMesh'] },
         sphere: { type: customCollisionRadiusOptsType, default: 0.25 },
-        capsule: { type: customPhysxCapsuleOptsType, default: {radius: 0.15, halfHeight: 0.25} },
+        capsule: { type: customPhysxCapsuleOptsType, default: { radius: 0.15, halfHeight: 0.25 } },
         box: { type: customCollisionExtentsOptsType, default: [0.25, 0.25, 0.25] },
-        convexMesh: { type: customPhysxMeshOptsType, default: {mesh: null, scaling: [1, 1, 1]} },
-        triangleMesh: { type: customPhysxMeshOptsType, default: {mesh: null, scaling: [1, 1, 1]} },
+        convexMesh: { type: customPhysxMeshOptsType, default: { mesh: null, scaling: [1, 1, 1] } },
+        triangleMesh: { type: customPhysxMeshOptsType, default: { mesh: null, scaling: [1, 1, 1] } },
         allowSimulation: { type: Type.Bool, default: true },
         trigger: { type: Type.Bool, default: false },
         allowQuery: { type: Type.Bool, default: true },
