@@ -52,7 +52,7 @@ async function defaultAction(projectGlobPaths: string[], options: CleanerOptions
             const tkProjectName = StringToken.assert(tkProjectSettings.getValueTokenOfKey("name")).evaluate();
 
             if (!editorBundle) {
-                editorBundle = resolvePath(parsePath(projectPath).dir, EDITOR_BUNDLE_DEFAULT_ROOT + "/" + tkProjectName + "/" + EDITOR_BUNDLE_DEFAULT_FILE);
+                editorBundle = resolvePath(parsePath(projectPath).dir, EDITOR_BUNDLE_DEFAULT_ROOT, tkProjectName, EDITOR_BUNDLE_DEFAULT_FILE);
             }
 
             let outputPath: string;
