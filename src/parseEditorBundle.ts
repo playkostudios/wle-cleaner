@@ -1,8 +1,8 @@
+import { CommanderError } from 'commander';
 import ivm from 'isolated-vm';
 import { readFileSync } from 'node:fs';
 import { type ModifiedComponentPropertyRecord } from './ModifiedComponentProperty.js';
 import { EDITOR_BUNDLE_EXTRA_DEFAULT } from './constants.js';
-import { CommanderError } from 'commander';
 import { prettyError } from './prettyError.js';
 
 const BUNDLE_PREAMBLE = `
@@ -28,14 +28,14 @@ export function parseEditorBundle(editorBundlePath: string, editorExtraBundlePat
     const jail = context.global;
     const components = new Map<string, ModifiedComponentPropertyRecord>();
 
-    jail.setSync('__marshalled__registerEditor', function(typeName: string, properties: ModifiedComponentPropertyRecord) {
+    jail.setSync('__marshalled__registerEditor', function (typeName: string, properties: ModifiedComponentPropertyRecord) {
         components.set(typeName, properties);
     });
 
     let editorBundleText: string
     try {
         editorBundleText = readFileSync(editorBundlePath, { encoding: 'utf8' });
-    } catch(err) {
+    } catch (err) {
         prettyError(err);
         throw new CommanderError(1, 'bundle-open-fail', 'Could not open editor bundle. Make sure you have build the project in the Wonderland Editor before running this tool');
     }
@@ -44,14 +44,14 @@ export function parseEditorBundle(editorBundlePath: string, editorExtraBundlePat
     if (editorExtraBundlePath) {
         try {
             editorExtraBundleText = readFileSync(editorExtraBundlePath, { encoding: "utf8" });
-        } catch(err) {
+        } catch (err) {
             prettyError(err);
             throw new CommanderError(1, 'bundle-extra-open-fail', 'Could not open editor bundle extra script');
         }
     } else {
         try {
             editorExtraBundleText = readFileSync(EDITOR_BUNDLE_EXTRA_DEFAULT, { encoding: 'utf8' });
-        } catch(err) {}
+        } catch (err) { }
     }
 
     const editorIndexModule = isolate.compileModuleSync(`${BUNDLE_PREAMBLE}\n${editorExtraBundleText}\n${editorBundleText}`);

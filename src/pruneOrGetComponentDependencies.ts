@@ -1,8 +1,8 @@
-import { ArrayToken, JSONTokenType, NumberToken, type ObjectToken, StringToken, type JSONValueToken } from '@playkostudios/jsonc-ast';
-import { type WLECleanerContext } from './WLECleanerContext.js';
+import { ArrayToken, JSONTokenType, NumberToken, StringToken, type JSONValueToken, type ObjectToken } from '@playkostudios/jsonc-ast';
 import { Type } from '@wonderlandengine/api';
 import { customCollisionExtentsOptsType, customCollisionRadiusOptsType, customOpaqueColorType, customPhysxCapsuleOptsType, customPhysxMeshOptsType, customVec3Type, customVec4Type } from './constants.js';
 import { type ModifiedComponentPropertyRecord } from './ModifiedComponentProperty.js';
+import { type WLECleanerContext } from './WLECleanerContext.js';
 
 export function pruneOrGetComponentDependencies(context: WLECleanerContext, properties: ModifiedComponentPropertyRecord, compType: string, objectName: string, tkComponentProperties: ObjectToken, propKey: string, tkPropValue: JSONValueToken) {
     // TODO only remove defaults if --prune-defaults is used
